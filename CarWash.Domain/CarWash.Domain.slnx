@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path="tests.yml" />
+  </Folder>
+  <Project Path="CarWash.Domain/CarWash.Domain.csproj" />
+  <Project Path="CarWash.Tests/CarWash.Tests.csproj" />
+</Solution>
