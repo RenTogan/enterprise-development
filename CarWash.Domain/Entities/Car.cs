@@ -6,6 +6,11 @@
 public class Car
 {
     /// <summary>
+    /// Идентификатор
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Госномер
     /// </summary>
     public required string LicensePlate { get; set; }

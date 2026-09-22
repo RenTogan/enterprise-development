@@ -6,6 +6,11 @@
 public class Order
 {
     /// <summary>
+    /// Идентификатор
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Клиент
     /// </summary>
     public required Client Client { get; set; }

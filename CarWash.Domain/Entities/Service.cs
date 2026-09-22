@@ -8,6 +8,11 @@ namespace CarWash.Domain.Entities;
 public class Service
 {
     /// <summary>
+    /// Идентификатор
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Название услуги
     /// </summary>
     public required string Name { get; set; }
