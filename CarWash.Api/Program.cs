@@ -1,9 +1,9 @@
-using System.Text.Json.Serialization;
 using CarWash.Api.Infrastructure;
 using CarWash.Application.Interfaces;
 using CarWash.Application.Services;
 using CarWash.Infrastructure.InMemory;
 using Scalar.AspNetCore;
+using System.Text.Json.Serialization;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

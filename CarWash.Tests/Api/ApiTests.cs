@@ -1,9 +1,7 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using CarWash.Contracts.Dtos;
-using CarWash.Domain.Enums;
+﻿using CarWash.Contracts.Dtos;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Xunit;
+using System.Net;
+using System.Net.Http.Json;
 
 namespace CarWash.Tests.Api;
 
