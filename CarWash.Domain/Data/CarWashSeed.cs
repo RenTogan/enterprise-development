@@ -1,29 +1,14 @@
 ﻿using CarWash.Domain.Entities;
 using CarWash.Domain.Enums;
 
-namespace CarWash.Tests;
+namespace CarWash.Domain.Data;
 
 /// <summary> 
-/// Тестовые данные для автомойки 
+/// Тестовые данные для автомойки: cписки машин, клиентов, услуг и заказов
 /// </summary>
-public class CarWashFixture
+public static class CarWashSeed
 {
-    /// <summary>
-    /// Список клиентов
-    /// </summary>
-    public List<Client> Clients { get; set; } = [];
-
-    /// <summary>
-    /// Список услуг
-    /// </summary>
-    public List<Service> Services { get; set; } = [];
-
-    /// <summary>
-    /// Список заказов
-    /// </summary>
-    public List<Order> Orders { get; set; } = [];
-
-    public CarWashFixture()
+    public static (List<Car> Cars, List<Client> Clients, List<Service> Services, List<Order> Orders) CreateInitialData()
     {
         // Машины
         var car1 = new Car { Id = 1, LicensePlate = "А111АА163", Brand = "Lada Azimut" };
@@ -37,6 +22,8 @@ public class CarWashFixture
         var car9 = new Car { Id = 9, LicensePlate = "О999ОО163", Brand = "Audi A6" };
         var car10 = new Car { Id = 10, LicensePlate = "Р000РР163", Brand = "Renault Logan" };
 
+        List<Car> cars = [car1, car2, car3, car4, car5, car6, car7, car8, car9, car10];
+
         // Клиенты
         var client1 = new Client { Id = 1, FullName = "Яцентюк Данила", Phone = "+79991112233", Cars = [car1] };
         var client2 = new Client { Id = 2, FullName = "Мансуров Роман", Phone = null, Cars = [car2, car5] };
@@ -49,7 +36,7 @@ public class CarWashFixture
         var client9 = new Client { Id = 9, FullName = "Новикова Ольга", Phone = "+79994445566", Cars = [car9] };
         var client10 = new Client { Id = 10, FullName = "Морозов Павел", Phone = "+79990001122", Cars = [car10] };
 
-        Clients.AddRange([client1, client2, client3, client4, client5, client6]);
+        List<Client> clients = [client1, client2, client3, client4, client5, client6, client7, client8, client9, client10];
 
         // Услуги
         var s1 = new Service { Id = 1, Name = "Экспресс мойка", Category = CarCategory.Passenger, Price = 500, DurationMinutes = 20 };
@@ -63,15 +50,15 @@ public class CarWashFixture
         var s9 = new Service { Id = 9, Name = "Восковое покрытие", Category = CarCategory.Passenger, Price = 700, DurationMinutes = 15 };
         var s10 = new Service { Id = 10, Name = "Удаление битумных пятен", Category = CarCategory.Minivan, Price = 1000, DurationMinutes = 40 };
 
-        Services.AddRange([s1, s2, s3, s4, s5, s6, s7, s8, s9, s10]);
+        List<Service> services = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10];
 
         // Время для тестов
         var baseTime = new DateTime(2026, 5, 10, 10, 0, 0);
 
         // Заказы
-        Orders =
+        List<Order> orders =
         [
-            // Данила
+            // Данилы
             new Order { Id = 1, Client = client1, Car = car1, Service = s1, StartTime = baseTime, BoxNumber = 1 },
             new Order { Id = 2, Client = client1, Car = car1, Service = s1, StartTime = baseTime.AddHours(2), BoxNumber = 1 },
             new Order { Id = 3, Client = client1, Car = car1, Service = s2, StartTime = baseTime.AddDays(1), BoxNumber = 2 },
@@ -103,5 +90,7 @@ public class CarWashFixture
             new Order { Id = 19, Client = client8, Car = car8, Service = s2, StartTime = baseTime.AddHours(2), BoxNumber = 5 },
             new Order { Id = 20, Client = client9, Car = car9, Service = s1, StartTime = baseTime.AddHours(3), BoxNumber = 5 }
         ];
+
+        return (cars, clients, services, orders);
     }
 }

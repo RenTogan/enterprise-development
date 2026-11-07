@@ -3,6 +3,10 @@
   <Folder Name="/.github/workflows/">
     <File Path="tests.yml" />
   </Folder>
+  <Project Path="CarWash.Api/CarWash.Api.csproj" Id="d788464e-7619-4c6c-879c-eea514a983d8" />
+  <Project Path="CarWash.Application/CarWash.Application.csproj" Id="bedb73bc-7bab-4962-8709-cb089c90af05" />
+  <Project Path="CarWash.Contracts/CarWash.Contracts.csproj" Id="56629577-9de8-4509-b9d7-a364e239752c" />
   <Project Path="CarWash.Domain/CarWash.Domain.csproj" />
+  <Project Path="CarWash.Infrastructure.InMemory/CarWash.Infrastructure.InMemory.csproj" Id="f040a08c-383c-444c-9d6b-0f47b4b99c75" />
   <Project Path="CarWash.Tests/CarWash.Tests.csproj" />
 </Solution>
