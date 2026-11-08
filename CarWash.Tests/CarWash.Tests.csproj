@@ -26,7 +26,6 @@
 		<ProjectReference Include="..\CarWash.Application\CarWash.Application.csproj" />
 		<ProjectReference Include="..\CarWash.Contracts\CarWash.Contracts.csproj" />
 		<ProjectReference Include="..\CarWash.Domain\CarWash.Domain.csproj" />
-		<ProjectReference Include="..\CarWash.Infrastructure.InMemory\CarWash.Infrastructure.InMemory.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

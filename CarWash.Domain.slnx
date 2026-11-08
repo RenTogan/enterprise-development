@@ -8,7 +8,6 @@
   <Project Path="CarWash.Application/CarWash.Application.csproj" />
   <Project Path="CarWash.Contracts/CarWash.Contracts.csproj" />
   <Project Path="CarWash.Domain/CarWash.Domain.csproj" />
-  <Project Path="CarWash.Infrastructure.InMemory/CarWash.Infrastructure.InMemory.csproj" />
   <Project Path="CarWash.Infrastructure.PostgreSQL/CarWash.Infrastructure.PostgreSQL.csproj" />
   <Project Path="CarWash.ServiceDefaults/CarWash.ServiceDefaults.csproj" />
   <Project Path="CarWash.Tests/CarWash.Tests.csproj" />
