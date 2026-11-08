@@ -8,13 +8,21 @@
 	<NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
-	<PackageReference Include="Scalar.AspNetCore" Version="2.18.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		  <PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Scalar.AspNetCore" Version="2.18.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.14" />
+	</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CarWash.Application\CarWash.Application.csproj" />
+    <ProjectReference Include="..\CarWash.Infrastructure.PostgreSQL\CarWash.Infrastructure.PostgreSQL.csproj" />
+    <ProjectReference Include="..\CarWash.ServiceDefaults\CarWash.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

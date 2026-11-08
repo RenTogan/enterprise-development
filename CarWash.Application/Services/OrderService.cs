@@ -2,43 +2,51 @@
 using CarWash.Application.Interfaces;
 using CarWash.Contracts.Dtos;
 using CarWash.Domain.Entities;
-using CarWash.Infrastructure.InMemory;
+using CarWash.Infrastructure.PostgreSQL;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarWash.Application.Services;
 
 /// <summary>
 /// Реализация сервиса заказов
 /// </summary>
-public class OrderService(IStorageContext storage) : IOrderService
+public class OrderService(CarWashDbContext db) : IOrderService
 {
-    public Task<List<OrderDto>> GetAllAsync()
+    public async Task<List<OrderDto>> GetAllAsync()
     {
-        var list = storage.Orders.Select(Map).ToList();
-        return Task.FromResult(list);
+        return await db.Orders
+            .Include(o => o.Client)
+            .Include(o => o.Car)
+            .Include(o => o.Service)
+            .Select(o => Map(o))
+            .ToListAsync();
     }
 
-    public Task<OrderDto> GetByIdAsync(int id)
+    public async Task<OrderDto> GetByIdAsync(int id)
     {
-        Order order = storage.Orders.FirstOrDefault(o => o.Id == id)
+        Order order = await db.Orders
+            .Include(o => o.Client)
+            .Include(o => o.Car)
+            .Include(o => o.Service)
+            .FirstOrDefaultAsync(o => o.Id == id)
             ?? throw new NotFoundException($"Заказ с Id {id} не найден");
 
-        return Task.FromResult(Map(order));
+        return Map(order);
     }
 
-    public Task<OrderDto> CreateAsync(OrderRequest request)
+    public async Task<OrderDto> CreateAsync(OrderRequest request)
     {
-        Client client = storage.Clients.FirstOrDefault(c => c.Id == request.ClientId!.Value)
+        Client client = await db.Clients.FirstOrDefaultAsync(c => c.Id == request.ClientId!.Value)
             ?? throw new BadRequestException($"Клиент с Id {request.ClientId} не существует");
 
-        Service service = storage.Services.FirstOrDefault(s => s.Id == request.ServiceId!.Value)
+        Service service = await db.Services.FirstOrDefaultAsync(s => s.Id == request.ServiceId!.Value)
             ?? throw new BadRequestException($"Услуга с Id {request.ServiceId} не существует");
 
-        Car car = storage.Cars.FirstOrDefault(c => c.Id == request.CarId!.Value)
+        Car car = await db.Cars.FirstOrDefaultAsync(c => c.Id == request.CarId!.Value)
             ?? throw new BadRequestException($"Автомобиль с Id {request.CarId} не существует");
 
         var order = new Order
         {
-            Id = storage.NextOrderId(),
             Client = client,
             Service = service,
             Car = car,
@@ -46,23 +54,24 @@ public class OrderService(IStorageContext storage) : IOrderService
             BoxNumber = request.BoxNumber!.Value
         };
 
-        storage.Orders.Add(order);
+        db.Orders.Add(order);
+        await db.SaveChangesAsync();
 
-        return Task.FromResult(Map(order));
+        return Map(order);
     }
 
-    public Task UpdateAsync(int id, OrderRequest request)
+    public async Task UpdateAsync(int id, OrderRequest request)
     {
-        Order order = storage.Orders.FirstOrDefault(o => o.Id == id)
+        Order order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id)
             ?? throw new NotFoundException($"Заказ с Id {id} не найден");
 
-        Client client = storage.Clients.FirstOrDefault(c => c.Id == request.ClientId!.Value)
+        Client client = await db.Clients.FirstOrDefaultAsync(c => c.Id == request.ClientId!.Value)
             ?? throw new BadRequestException($"Клиент с Id {request.ClientId} не существует");
 
-        Service service = storage.Services.FirstOrDefault(s => s.Id == request.ServiceId!.Value)
+        Service service = await db.Services.FirstOrDefaultAsync(s => s.Id == request.ServiceId!.Value)
             ?? throw new BadRequestException($"Услуга с Id {request.ServiceId} не существует");
 
-        Car car = storage.Cars.FirstOrDefault(c => c.Id == request.CarId!.Value)
+        Car car = await db.Cars.FirstOrDefaultAsync(c => c.Id == request.CarId!.Value)
             ?? throw new BadRequestException($"Автомобиль с Id {request.CarId} не существует");
 
         order.Client = client;
@@ -71,16 +80,16 @@ public class OrderService(IStorageContext storage) : IOrderService
         order.StartTime = request.StartTime!.Value;
         order.BoxNumber = request.BoxNumber!.Value;
 
-        return Task.CompletedTask;
+        await db.SaveChangesAsync();
     }
 
-    public Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
-        Order order = storage.Orders.FirstOrDefault(o => o.Id == id)
-            ?? throw new NotFoundException($"заказ с Id {id} не найден");
+        Order order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id)
+            ?? throw new NotFoundException($"Заказ с Id {id} не найден");
 
-        storage.Orders.Remove(order);
-        return Task.CompletedTask;
+        db.Orders.Remove(order);
+        await db.SaveChangesAsync();
     }
 
     private static OrderDto Map(Order o) => new()

@@ -1,34 +1,38 @@
 ﻿using CarWash.Application.Interfaces;
 using CarWash.Contracts.Dtos;
 using CarWash.Domain.Entities;
-using CarWash.Infrastructure.InMemory;
+using CarWash.Infrastructure.PostgreSQL;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarWash.Application.Services;
 
 /// <summary>
 /// Аналитические выборки
 /// </summary>
-public class AnalyticsService(IStorageContext storage) : IAnalyticsService
+public class AnalyticsService(CarWashDbContext db) : IAnalyticsService
 {
     // Зап1: Топ клиентов по числу посещений
-    public Task<List<TopClientDto>> GetTopClientsAsync(int count = 5)
+    public async Task<List<TopClientDto>> GetTopClientsAsync(int count = 5)
     {
-        var result = storage.Orders
-            .GroupBy(o => o.Client)
+        return await db.Orders
+            .GroupBy(o => new { o.Client.Id, o.Client.FullName })
             .OrderByDescending(g => g.Count())
             .Take(count)
             .Select(g => new TopClientDto(g.Key.Id, g.Key.FullName, g.Count()))
-            .ToList();
-
-        return Task.FromResult(result);
+            .ToListAsync();
     }
 
     // Зап2: Автомобили на мойке прямо сейчас
-    public Task<List<ActiveCarDto>> GetCurrentCarsAtWashAsync(DateTime? atTime = null)
+    public async Task<List<ActiveCarDto>> GetCurrentCarsAtWashAsync(DateTime? atTime = null)
     {
         DateTime time = atTime ?? DateTime.Now;
 
-        var result = storage.Orders
+        List<Order> orders = await db.Orders
+            .Include(o => o.Car)
+            .Include(o => o.Service)
+            .ToListAsync();
+
+        return orders
             .Where(o => o.StartTime <= time && time < o.StartTime.AddMinutes(o.Service.DurationMinutes))
             .Select(o => new ActiveCarDto(
                 o.Car.Id,
@@ -40,36 +44,33 @@ public class AnalyticsService(IStorageContext storage) : IAnalyticsService
                 o.StartTime.AddMinutes(o.Service.DurationMinutes)
             ))
             .ToList();
-
-        return Task.FromResult(result);
     }
 
     // Зап3: Топ популярных услуг
-    public Task<List<PopularServiceDto>> GetTopServicesAsync(int count = 5)
+    public async Task<List<PopularServiceDto>> GetTopServicesAsync(int count = 5)
     {
-        var result = storage.Orders
-            .GroupBy(o => o.Service)
+        return await db.Orders
+            .GroupBy(o => new { o.Service.Id, o.Service.Name })
             .OrderByDescending(g => g.Count())
             .Take(count)
             .Select(g => new PopularServiceDto(g.Key.Id, g.Key.Name, g.Count()))
-            .ToList();
-
-        return Task.FromResult(result);
+            .ToListAsync();
     }
 
     // Зап4: Время освобождения бокса
-    public Task<BoxFreeTimeDto> GetBoxFreeTimeAsync(int boxNumber, DateTime? fromTime = null)
+    public async Task<BoxFreeTimeDto> GetBoxFreeTimeAsync(int boxNumber, DateTime? fromTime = null)
     {
         DateTime currentTime = fromTime ?? DateTime.Now;
 
-        var busyOrders = storage.Orders
-            .Where(o => o.BoxNumber == boxNumber && o.StartTime.AddMinutes(o.Service.DurationMinutes) > currentTime)
+        List<Order> busyOrders = await db.Orders
+            .Include(o => o.Service)
+            .Where(o => o.BoxNumber == boxNumber)
             .OrderBy(o => o.StartTime)
-            .ToList();
+            .ToListAsync();
 
         DateTime freeTime = currentTime;
 
-        foreach (Order order in busyOrders)
+        foreach (Order? order in busyOrders.Where(o => o.StartTime.AddMinutes(o.Service.DurationMinutes) > currentTime))
         {
             DateTime orderEndTime = order.StartTime.AddMinutes(order.Service.DurationMinutes);
 
@@ -86,24 +87,19 @@ public class AnalyticsService(IStorageContext storage) : IAnalyticsService
             }
         }
 
-        return Task.FromResult(new BoxFreeTimeDto(boxNumber, freeTime));
+        return new BoxFreeTimeDto(boxNumber, freeTime);
     }
 
     // Запр5: Суммарная выручка по каждой услуге
-    public Task<List<ServiceRevenueDto>> GetServiceRevenuesAsync()
+    public async Task<List<ServiceRevenueDto>> GetServiceRevenuesAsync()
     {
-        var result = storage.Services
-            .Select(s =>
-            {
-                var revenue = storage.Orders
-                    .Where(o => o.Service.Id == s.Id)
-                    .Sum(o => o.Service.Price);
-
-                return new ServiceRevenueDto(s.Id, s.Name, revenue);
-            })
+        return await db.Services
+            .Select(s => new ServiceRevenueDto(
+                s.Id,
+                s.Name,
+                db.Orders.Where(o => o.Service.Id == s.Id).Sum(o => o.Service.Price)
+            ))
             .OrderByDescending(r => r.TotalRevenue)
-            .ToList();
-
-        return Task.FromResult(result);
+            .ToListAsync();
     }
 }

@@ -2,70 +2,71 @@
 using CarWash.Application.Interfaces;
 using CarWash.Contracts.Dtos;
 using CarWash.Domain.Entities;
-using CarWash.Infrastructure.InMemory;
+using CarWash.Infrastructure.PostgreSQL;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarWash.Application.Services;
 
 /// <summary>
 /// Реализация сервиса услуг
 /// </summary>
-public class WashServiceService(IStorageContext storage) : IWashServiceService
+public class WashServiceService(CarWashDbContext db) : IWashServiceService
 {
-    public Task<List<ServiceDto>> GetAllAsync()
+    public async Task<List<ServiceDto>> GetAllAsync()
     {
-        var result = storage.Services.Select(s => new ServiceDto
-        {
-            Id = s.Id,
-            Name = s.Name,
-            Category = s.Category,
-            Price = s.Price,
-            DurationMinutes = s.DurationMinutes
-        }).ToList();
-
-        return Task.FromResult(result);
+        return await db.Services
+            .Select(s => new ServiceDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Category = s.Category,
+                Price = s.Price,
+                DurationMinutes = s.DurationMinutes
+            })
+            .ToListAsync();
     }
 
-    public Task<ServiceDto> GetByIdAsync(int id)
+    public async Task<ServiceDto> GetByIdAsync(int id)
     {
-        Service s = storage.Services.FirstOrDefault(x => x.Id == id)
+        Service s = await db.Services.FirstOrDefaultAsync(x => x.Id == id)
             ?? throw new NotFoundException($"Услуга с Id {id} не найдена");
 
-        return Task.FromResult(new ServiceDto
+        return new ServiceDto
         {
             Id = s.Id,
             Name = s.Name,
             Category = s.Category,
             Price = s.Price,
             DurationMinutes = s.DurationMinutes
-        });
+        };
     }
 
-    public Task<ServiceDto> CreateAsync(ServiceRequest request)
+    public async Task<ServiceDto> CreateAsync(ServiceRequest request)
     {
         var service = new Service
         {
-            Id = storage.NextServiceId(),
             Name = request.Name.Trim(),
             Category = request.Category!.Value,
             Price = request.Price!.Value,
             DurationMinutes = request.DurationMinutes!.Value
         };
 
-        storage.Services.Add(service);
+        db.Services.Add(service);
+        await db.SaveChangesAsync();
 
-        return Task.FromResult(new ServiceDto
+        return new ServiceDto
         {
             Id = service.Id,
             Name = service.Name,
             Category = service.Category,
             Price = service.Price,
             DurationMinutes = service.DurationMinutes
-        });
+        };
     }
 
-    public Task UpdateAsync(int id, ServiceRequest request)
+    public async Task UpdateAsync(int id, ServiceRequest request)
     {
-        Service service = storage.Services.FirstOrDefault(s => s.Id == id)
+        Service service = await db.Services.FirstOrDefaultAsync(s => s.Id == id)
             ?? throw new NotFoundException($"Услуга с Id {id} не найдена");
 
         service.Name = request.Name.Trim();
@@ -73,20 +74,20 @@ public class WashServiceService(IStorageContext storage) : IWashServiceService
         service.Price = request.Price!.Value;
         service.DurationMinutes = request.DurationMinutes!.Value;
 
-        return Task.CompletedTask;
+        await db.SaveChangesAsync();
     }
 
-    public Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
-        Service service = storage.Services.FirstOrDefault(s => s.Id == id)
-            ?? throw new NotFoundException($"услуга с Id {id} не найдена");
+        Service service = await db.Services.FirstOrDefaultAsync(s => s.Id == id)
+            ?? throw new NotFoundException($"Услуга с Id {id} не найдена");
 
-        if (storage.Orders.Any(o => o.Service.Id == id))
+        if (await db.Orders.AnyAsync(o => o.Service.Id == id))
         {
-            throw new ConflictException("Нельзя удалить услугу, которая фигурирует в заказах");
+            throw new ConflictException("Нельзя удалить услугу, которая есть в заказах");
         }
 
-        storage.Services.Remove(service);
-        return Task.CompletedTask;
+        db.Services.Remove(service);
+        await db.SaveChangesAsync();
     }
 }

@@ -2,18 +2,20 @@
 using CarWash.Application.Interfaces;
 using CarWash.Contracts.Dtos;
 using CarWash.Domain.Entities;
-using CarWash.Infrastructure.InMemory;
+using CarWash.Infrastructure.PostgreSQL;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarWash.Application.Services;
 
 /// <summary>
 /// Реализация сервиса клиентов
 /// </summary>
-public class ClientService(IStorageContext storage) : IClientService
+public class ClientService(CarWashDbContext db) : IClientService
 {
-    public Task<List<ClientDto>> GetAllAsync()
+    public async Task<List<ClientDto>> GetAllAsync()
     {
-        var result = storage.Clients
+        return await db.Clients
+            .Include(c => c.Cars)
             .Select(c => new ClientDto
             {
                 Id = c.Id,
@@ -21,103 +23,107 @@ public class ClientService(IStorageContext storage) : IClientService
                 Phone = c.Phone,
                 CarIds = c.Cars.Select(car => car.Id).ToList()
             })
-            .ToList();
-
-        return Task.FromResult(result);
+            .ToListAsync();
     }
 
-    public Task<ClientDto> GetByIdAsync(int id)
+    public async Task<ClientDto> GetByIdAsync(int id)
     {
-        Client client = storage.Clients.FirstOrDefault(c => c.Id == id)
+        Client client = await db.Clients
+            .Include(c => c.Cars)
+            .FirstOrDefaultAsync(c => c.Id == id)
             ?? throw new NotFoundException($"Клиент с Id {id} не найден");
 
-        return Task.FromResult(new ClientDto
+        return new ClientDto
         {
             Id = client.Id,
             FullName = client.FullName,
             Phone = client.Phone,
             CarIds = client.Cars.Select(car => car.Id).ToList()
-        });
+        };
     }
 
-    public Task<ClientDto> CreateAsync(ClientRequest request)
+    public async Task<ClientDto> CreateAsync(ClientRequest request)
     {
         List<Car> clientCars = [];
-        if (request.CarIds is not null && request.CarIds.Count > 0)
+        if (request.CarIds != null && request.CarIds.Count > 0)
         {
-            clientCars = storage.Cars.Where(c => request.CarIds.Contains(c.Id)).ToList();
+            clientCars = await db.Cars.Where(c => request.CarIds.Contains(c.Id)).ToListAsync();
         }
 
         var client = new Client
         {
-            Id = storage.NextClientId(),
             FullName = request.FullName.Trim(),
             Phone = request.Phone?.Trim(),
             Cars = clientCars
         };
 
-        storage.Clients.Add(client);
+        db.Clients.Add(client);
+        await db.SaveChangesAsync();
 
-        return Task.FromResult(new ClientDto
+        return new ClientDto
         {
             Id = client.Id,
             FullName = client.FullName,
             Phone = client.Phone,
-            CarIds = client.Cars.Select(car => car.Id).ToList()
-        });
+            CarIds = client.Cars.Select(c => c.Id).ToList()
+        };
     }
 
-    public Task UpdateAsync(int id, ClientRequest request)
+    public async Task UpdateAsync(int id, ClientRequest request)
     {
-        Client client = storage.Clients.FirstOrDefault(c => c.Id == id)
+        Client client = await db.Clients
+            .Include(c => c.Cars)
+            .FirstOrDefaultAsync(c => c.Id == id)
             ?? throw new NotFoundException($"Клиент с Id {id} не найден");
 
         client.FullName = request.FullName.Trim();
         client.Phone = request.Phone?.Trim();
 
-        if (request.CarIds is not null)
+        if (request.CarIds != null)
         {
-            client.Cars = storage.Cars.Where(c => request.CarIds.Contains(c.Id)).ToList();
+            client.Cars = await db.Cars.Where(c => request.CarIds.Contains(c.Id)).ToListAsync();
         }
 
-        return Task.CompletedTask;
+        await db.SaveChangesAsync();
     }
 
-    public Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
-        Client client = storage.Clients.FirstOrDefault(c => c.Id == id)
+        Client client = await db.Clients.FirstOrDefaultAsync(c => c.Id == id)
             ?? throw new NotFoundException($"Клиент с Id {id} не найден");
 
-        if (storage.Orders.Any(o => o.Client.Id == id))
+        if (await db.Orders.AnyAsync(o => o.Client.Id == id))
         {
-            throw new ConflictException("Нельзя удалить клиента, у которого есть активные заказы");
+            throw new ConflictException("Нельзя удалить клиента с заказами");
         }
 
-        storage.Clients.Remove(client);
-        return Task.CompletedTask;
+        db.Clients.Remove(client);
+        await db.SaveChangesAsync();
     }
 
-    public Task<List<CarDto>> GetClientCarsAsync(int clientId)
+    public async Task<List<CarDto>> GetClientCarsAsync(int clientId)
     {
-        Client client = storage.Clients.FirstOrDefault(c => c.Id == clientId)
+        Client client = await db.Clients
+            .Include(c => c.Cars)
+            .FirstOrDefaultAsync(c => c.Id == clientId)
             ?? throw new NotFoundException($"Клиент с Id {clientId} не найден");
 
-        var cars = client.Cars.Select(car => new CarDto
+        return client.Cars.Select(c => new CarDto
         {
-            Id = car.Id,
-            LicensePlate = car.LicensePlate,
-            Brand = car.Brand
+            Id = c.Id,
+            LicensePlate = c.LicensePlate,
+            Brand = c.Brand
         }).ToList();
-
-        return Task.FromResult(cars);
     }
 
-    public Task<List<OrderDto>> GetClientOrdersAsync(int clientId)
+    public async Task<List<OrderDto>> GetClientOrdersAsync(int clientId)
     {
-        _ = storage.Clients.FirstOrDefault(c => c.Id == clientId)
-            ?? throw new NotFoundException($"Клиент с Id {clientId} не найден");
+        if (!await db.Clients.AnyAsync(c => c.Id == clientId))
+        {
+            throw new NotFoundException($"Клиент с Id {clientId} не найден");
+        }
 
-        var orders = storage.Orders
+        return await db.Orders
             .Where(o => o.Client.Id == clientId)
             .Select(o => new OrderDto
             {
@@ -130,8 +136,7 @@ public class ClientService(IStorageContext storage) : IClientService
                 LicensePlate = o.Car.LicensePlate,
                 StartTime = o.StartTime,
                 BoxNumber = o.BoxNumber
-            }).ToList();
-
-        return Task.FromResult(orders);
+            })
+            .ToListAsync();
     }
 }
