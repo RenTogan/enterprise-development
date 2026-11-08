@@ -27,12 +27,7 @@ public class AnalyticsService(CarWashDbContext db) : IAnalyticsService
     {
         DateTime time = atTime ?? DateTime.Now;
 
-        List<Order> orders = await db.Orders
-            .Include(o => o.Car)
-            .Include(o => o.Service)
-            .ToListAsync();
-
-        return orders
+        return await db.Orders
             .Where(o => o.StartTime <= time && time < o.StartTime.AddMinutes(o.Service.DurationMinutes))
             .Select(o => new ActiveCarDto(
                 o.Car.Id,
@@ -43,7 +38,7 @@ public class AnalyticsService(CarWashDbContext db) : IAnalyticsService
                 o.StartTime,
                 o.StartTime.AddMinutes(o.Service.DurationMinutes)
             ))
-            .ToList();
+            .ToListAsync();
     }
 
     // Зап3: Топ популярных услуг
@@ -94,12 +89,19 @@ public class AnalyticsService(CarWashDbContext db) : IAnalyticsService
     public async Task<List<ServiceRevenueDto>> GetServiceRevenuesAsync()
     {
         return await db.Services
-            .Select(s => new ServiceRevenueDto(
-                s.Id,
-                s.Name,
-                db.Orders.Where(o => o.Service.Id == s.Id).Sum(o => o.Service.Price)
-            ))
+            .GroupJoin(
+                db.Orders,
+                s => s.Id,
+                o => o.Service.Id,
+                (service, orders) => new
+                {
+                    service.Id,
+                    service.Name,
+                    TotalRevenue = orders.Sum(o => (decimal?)o.Service.Price) ?? 0m
+                }
+            )
             .OrderByDescending(r => r.TotalRevenue)
+            .Select(r => new ServiceRevenueDto(r.Id, r.Name, r.TotalRevenue))
             .ToListAsync();
     }
 }
