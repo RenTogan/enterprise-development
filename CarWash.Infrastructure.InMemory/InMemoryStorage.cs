@@ -33,23 +33,12 @@ public class InMemoryStorage : IStorageContext
         _orderId = Orders.Count > 0 ? Orders.Max(x => x.Id) : 0;
     }
 
-    public int NextCarId()
-    {
-        lock (_lock) return ++_carId;
-    }
+    public int NextCarId() => Interlocked.Increment(ref _carId);
 
-    public int NextClientId()
-    {
-        lock (_lock) return ++_clientId;
-    }
+    public int NextClientId() => Interlocked.Increment(ref _clientId);
 
-    public int NextServiceId()
-    {
-        lock (_lock) return ++_serviceId;
-    }
+    public int NextServiceId() => Interlocked.Increment(ref _serviceId);
 
-    public int NextOrderId()
-    {
-        lock (_lock) return ++_orderId;
-    }
+    public int NextOrderId() => Interlocked.Increment(ref _orderId);
+
 }
