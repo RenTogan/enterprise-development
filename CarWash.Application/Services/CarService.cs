@@ -2,7 +2,6 @@
 using CarWash.Application.Interfaces;
 using CarWash.Contracts.Dtos;
 using CarWash.Domain.Entities;
-using CarWash.Infrastructure.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarWash.Application.Services;
@@ -10,24 +9,28 @@ namespace CarWash.Application.Services;
 /// <summary>
 /// Реализация сервиса автомобилей
 /// </summary>
-public class CarService(CarWashDbContext db) : ICarService
+public class CarService(ICarWashDbContext db) : ICarService
 {
     public async Task<List<CarDto>> GetAllAsync()
     {
         return await db.Cars
+            .AsNoTracking()
             .Select(c => new CarDto { Id = c.Id, LicensePlate = c.LicensePlate, Brand = c.Brand })
             .ToListAsync();
     }
 
     public async Task<CarDto> GetByIdAsync(int id)
     {
-        Car car = await db.Cars.FirstOrDefaultAsync(c => c.Id == id)
-            ?? throw new NotFoundException($"машина с Id {id} не найдена");
+        Car car = await db.Cars
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id)
+            ?? throw new NotFoundException($"Машина с Id {id} не найдена");
 
-        return new CarDto { 
-            Id = car.Id, 
-            LicensePlate = car.LicensePlate, 
-            Brand = car.Brand 
+        return new CarDto
+        {
+            Id = car.Id,
+            LicensePlate = car.LicensePlate,
+            Brand = car.Brand
         };
     }
 
@@ -48,10 +51,11 @@ public class CarService(CarWashDbContext db) : ICarService
         db.Cars.Add(car);
         await db.SaveChangesAsync();
 
-        return new CarDto { 
-            Id = car.Id, 
-            LicensePlate = car.LicensePlate, 
-            Brand = car.Brand 
+        return new CarDto
+        {
+            Id = car.Id,
+            LicensePlate = car.LicensePlate,
+            Brand = car.Brand
         };
     }
 

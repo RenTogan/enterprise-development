@@ -212,7 +212,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -232,7 +232,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 1,
                             ClientId = 1,
                             ServiceId = 1,
-                            StartTime = new DateTime(2026, 5, 10, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -241,7 +241,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 1,
                             ClientId = 1,
                             ServiceId = 1,
-                            StartTime = new DateTime(2026, 5, 10, 12, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 12, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -250,7 +250,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 1,
                             ClientId = 1,
                             ServiceId = 2,
-                            StartTime = new DateTime(2026, 5, 11, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 11, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -259,7 +259,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 1,
                             ClientId = 1,
                             ServiceId = 7,
-                            StartTime = new DateTime(2026, 5, 12, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 12, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -268,7 +268,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 1,
                             ClientId = 1,
                             ServiceId = 9,
-                            StartTime = new DateTime(2026, 5, 13, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 13, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -277,7 +277,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 2,
                             ClientId = 2,
                             ServiceId = 2,
-                            StartTime = new DateTime(2026, 5, 10, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -286,7 +286,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 2,
                             ClientId = 2,
                             ServiceId = 2,
-                            StartTime = new DateTime(2026, 5, 10, 13, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 13, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -295,7 +295,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 5,
                             ClientId = 2,
                             ServiceId = 5,
-                            StartTime = new DateTime(2026, 5, 11, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 11, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -304,7 +304,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 5,
                             ClientId = 2,
                             ServiceId = 1,
-                            StartTime = new DateTime(2026, 5, 12, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 12, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -313,7 +313,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 3,
                             ClientId = 3,
                             ServiceId = 3,
-                            StartTime = new DateTime(2026, 5, 10, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -322,7 +322,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 3,
                             ClientId = 3,
                             ServiceId = 3,
-                            StartTime = new DateTime(2026, 5, 12, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 12, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -331,7 +331,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 3,
                             ClientId = 3,
                             ServiceId = 3,
-                            StartTime = new DateTime(2026, 5, 14, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 14, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -340,7 +340,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 4,
                             ClientId = 4,
                             ServiceId = 5,
-                            StartTime = new DateTime(2026, 5, 10, 10, 10, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 10, 10, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -349,7 +349,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 4,
                             ClientId = 4,
                             ServiceId = 1,
-                            StartTime = new DateTime(2026, 5, 11, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 11, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -358,7 +358,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 1,
                             ClientId = 5,
                             ServiceId = 4,
-                            StartTime = new DateTime(2026, 5, 10, 15, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 15, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -367,7 +367,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 1,
                             ClientId = 5,
                             ServiceId = 6,
-                            StartTime = new DateTime(2026, 5, 13, 10, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 13, 10, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -376,7 +376,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 2,
                             ClientId = 6,
                             ServiceId = 8,
-                            StartTime = new DateTime(2026, 5, 10, 14, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 14, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -385,7 +385,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 6,
                             ClientId = 7,
                             ServiceId = 10,
-                            StartTime = new DateTime(2026, 5, 10, 11, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 11, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -394,7 +394,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 8,
                             ClientId = 8,
                             ServiceId = 2,
-                            StartTime = new DateTime(2026, 5, 10, 12, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 12, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -403,7 +403,7 @@ namespace CarWash.Infrastructure.PostgreSQL.Migrations
                             CarId = 9,
                             ClientId = 9,
                             ServiceId = 1,
-                            StartTime = new DateTime(2026, 5, 10, 13, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(2026, 5, 10, 13, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 

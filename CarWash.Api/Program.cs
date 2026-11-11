@@ -30,11 +30,8 @@ builder.Services.AddOpenApi(options =>
     });
 });
 
-var connectionString = builder.Configuration.GetConnectionString("carwashdb")
-    ?? "Host=localhost;Port=5432;Database=carwashdb;Username=postgres;Password=postgres";
-
-builder.Services.AddDbContext<CarWashDbContext>(options =>
-    options.UseNpgsql(connectionString));
+builder.AddNpgsqlDbContext<CarWashDbContext>("carwashdb");
+builder.Services.AddScoped<ICarWashDbContext>(sp => sp.GetRequiredService<CarWashDbContext>());
 
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<ICarService, CarService>();
@@ -62,5 +59,3 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 
 app.Run();
-
-public partial class Program { }

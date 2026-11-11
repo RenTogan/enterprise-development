@@ -22,7 +22,7 @@ public class AnalyticsController(IAnalyticsService analyticsService) : Controlle
     /// Автомобили на мойке в текущий момент
     /// </summary>
     [HttpGet("current-cars")]
-    public async Task<ActionResult<List<ActiveCarDto>>> GetCurrentCars([FromQuery] DateTime? atTime) =>
+    public async Task<ActionResult<List<ActiveCarDto>>> GetCurrentCars([FromQuery] DateTimeOffset? atTime) =>
         Ok(await analyticsService.GetCurrentCarsAtWashAsync(atTime));
 
     /// <summary>
@@ -36,7 +36,7 @@ public class AnalyticsController(IAnalyticsService analyticsService) : Controlle
     /// Время освобождения выбранного бокса
     /// </summary>
     [HttpGet("box-free-time")]
-    public async Task<ActionResult<BoxFreeTimeDto>> GetBoxFreeTime([FromQuery] int boxNumber, [FromQuery] DateTime? fromTime) =>
+    public async Task<ActionResult<BoxFreeTimeDto>> GetBoxFreeTime([FromQuery] int boxNumber, [FromQuery] DateTimeOffset? fromTime) =>
         Ok(await analyticsService.GetBoxFreeTimeAsync(boxNumber, fromTime));
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using CarWash.Domain.Data;
+﻿using CarWash.Application.Interfaces;
+using CarWash.Domain.Data;
 using CarWash.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +8,7 @@ namespace CarWash.Infrastructure.PostgreSQL;
 /// <summary>
 /// Контекст базы данных мойки
 /// </summary>
-public class CarWashDbContext(DbContextOptions<CarWashDbContext> options) : DbContext(options)
+public class CarWashDbContext(DbContextOptions<CarWashDbContext> options) : DbContext(options), ICarWashDbContext
 {
     public DbSet<Car> Cars => Set<Car>();
     public DbSet<Client> Clients => Set<Client>();
@@ -55,7 +56,7 @@ public class CarWashDbContext(DbContextOptions<CarWashDbContext> options) : DbCo
             b.HasOne(o => o.Client).WithMany().OnDelete(DeleteBehavior.Restrict);
             b.HasOne(o => o.Car).WithMany().OnDelete(DeleteBehavior.Restrict);
             b.HasOne(o => o.Service).WithMany().OnDelete(DeleteBehavior.Restrict);
-            b.Property(o => o.StartTime).HasColumnType("timestamp without time zone");
+            b.Property(o => o.StartTime).HasColumnType("timestamp with time zone");
         });
 
         SeedData(modelBuilder);

@@ -7,9 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CarWash.Contracts\CarWash.Contracts.csproj" />
     <ProjectReference Include="..\CarWash.Domain\CarWash.Domain.csproj" />
-    <ProjectReference Include="..\CarWash.Infrastructure.PostgreSQL\CarWash.Infrastructure.PostgreSQL.csproj" />
   </ItemGroup>
 
 </Project>

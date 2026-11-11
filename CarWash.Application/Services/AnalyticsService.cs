@@ -1,7 +1,6 @@
 ﻿using CarWash.Application.Interfaces;
 using CarWash.Contracts.Dtos;
 using CarWash.Domain.Entities;
-using CarWash.Infrastructure.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarWash.Application.Services;
@@ -9,12 +8,12 @@ namespace CarWash.Application.Services;
 /// <summary>
 /// Аналитические выборки
 /// </summary>
-public class AnalyticsService(CarWashDbContext db) : IAnalyticsService
+public class AnalyticsService(ICarWashDbContext db) : IAnalyticsService
 {
-    // Зап1: Топ клиентов по числу посещений
     public async Task<List<TopClientDto>> GetTopClientsAsync(int count = 5)
     {
         return await db.Orders
+            .AsNoTracking()
             .GroupBy(o => new { o.Client.Id, o.Client.FullName })
             .OrderByDescending(g => g.Count())
             .Take(count)
@@ -22,12 +21,14 @@ public class AnalyticsService(CarWashDbContext db) : IAnalyticsService
             .ToListAsync();
     }
 
+
     // Зап2: Автомобили на мойке прямо сейчас
-    public async Task<List<ActiveCarDto>> GetCurrentCarsAtWashAsync(DateTime? atTime = null)
+    public async Task<List<ActiveCarDto>> GetCurrentCarsAtWashAsync(DateTimeOffset? atTime = null)
     {
-        DateTime time = atTime ?? DateTime.Now;
+        DateTime time = (atTime ?? DateTimeOffset.UtcNow).UtcDateTime;
 
         return await db.Orders
+            .AsNoTracking()
             .Where(o => o.StartTime <= time && time < o.StartTime.AddMinutes(o.Service.DurationMinutes))
             .Select(o => new ActiveCarDto(
                 o.Car.Id,
@@ -45,6 +46,7 @@ public class AnalyticsService(CarWashDbContext db) : IAnalyticsService
     public async Task<List<PopularServiceDto>> GetTopServicesAsync(int count = 5)
     {
         return await db.Orders
+            .AsNoTracking()
             .GroupBy(o => new { o.Service.Id, o.Service.Name })
             .OrderByDescending(g => g.Count())
             .Take(count)
@@ -53,11 +55,12 @@ public class AnalyticsService(CarWashDbContext db) : IAnalyticsService
     }
 
     // Зап4: Время освобождения бокса
-    public async Task<BoxFreeTimeDto> GetBoxFreeTimeAsync(int boxNumber, DateTime? fromTime = null)
+    public async Task<BoxFreeTimeDto> GetBoxFreeTimeAsync(int boxNumber, DateTimeOffset? fromTime = null)
     {
-        DateTime currentTime = fromTime ?? DateTime.Now;
+        DateTime currentTime = (fromTime ?? DateTimeOffset.UtcNow).UtcDateTime;
 
         List<Order> busyOrders = await db.Orders
+            .AsNoTracking()
             .Include(o => o.Service)
             .Where(o => o.BoxNumber == boxNumber)
             .OrderBy(o => o.StartTime)
@@ -89,8 +92,9 @@ public class AnalyticsService(CarWashDbContext db) : IAnalyticsService
     public async Task<List<ServiceRevenueDto>> GetServiceRevenuesAsync()
     {
         return await db.Services
+            .AsNoTracking()
             .GroupJoin(
-                db.Orders,
+                db.Orders.AsNoTracking(),
                 s => s.Id,
                 o => o.Service.Id,
                 (service, orders) => new

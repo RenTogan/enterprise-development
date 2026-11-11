@@ -1,17 +1,31 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace CarWash.Infrastructure.PostgreSQL;
 
 /// <summary>
-/// фабрика контекста для миграций через dotnet
+/// Фабрика контекста для миграций через dotnet ef
 /// </summary>
 public class CarWashDbContextFactory : IDesignTimeDbContextFactory<CarWashDbContext>
 {
     public CarWashDbContext CreateDbContext(string[] args)
     {
+        var basePath = Directory.GetCurrentDirectory();
+
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+            .SetBasePath(basePath)
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddJsonFile("appsettings.Development.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        var connectionString = configuration.GetConnectionString("carwashdb")
+            ?? configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Строка подключения 'carwashdb' не найдена в конфигурации.");
+
         DbContextOptions<CarWashDbContext> options = new DbContextOptionsBuilder<CarWashDbContext>()
-            .UseNpgsql("Host=localhost;Port=5432;Database=carwashdb;Username=postgres;Password=postgres")
+            .UseNpgsql(connectionString)
             .Options;
 
         return new CarWashDbContext(options);

@@ -1,6 +1,8 @@
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
-IResourceBuilder<PostgresServerResource> postgres = builder.AddPostgres("postgres")
+IResourceBuilder<ParameterResource> postgresPassword = builder.AddParameter("postgres-password", "postgres", secret: true);
+
+IResourceBuilder<PostgresServerResource> postgres = builder.AddPostgres("postgres", password: postgresPassword)
     .WithDataVolume();
 
 IResourceBuilder<PostgresDatabaseResource> db = postgres.AddDatabase("carwashdb");

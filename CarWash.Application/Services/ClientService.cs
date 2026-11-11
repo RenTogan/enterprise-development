@@ -2,7 +2,6 @@
 using CarWash.Application.Interfaces;
 using CarWash.Contracts.Dtos;
 using CarWash.Domain.Entities;
-using CarWash.Infrastructure.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarWash.Application.Services;
@@ -10,25 +9,28 @@ namespace CarWash.Application.Services;
 /// <summary>
 /// Реализация сервиса клиентов
 /// </summary>
-public class ClientService(CarWashDbContext db) : IClientService
+public class ClientService(ICarWashDbContext db) : IClientService
 {
     public async Task<List<ClientDto>> GetAllAsync()
     {
-        return await db.Clients
+        var clients = await db.Clients
+            .AsNoTracking()
             .Include(c => c.Cars)
-            .Select(c => new ClientDto
-            {
-                Id = c.Id,
-                FullName = c.FullName,
-                Phone = c.Phone,
-                CarIds = c.Cars.Select(car => car.Id).ToList()
-            })
             .ToListAsync();
+
+        return [.. clients.Select(client => new ClientDto
+        {
+            Id = client.Id,
+            FullName = client.FullName,
+            Phone = client.Phone,
+            CarIds = [.. client.Cars.Select(car => car.Id)]
+        })];
     }
 
     public async Task<ClientDto> GetByIdAsync(int id)
     {
         Client client = await db.Clients
+            .AsNoTracking()
             .Include(c => c.Cars)
             .FirstOrDefaultAsync(c => c.Id == id)
             ?? throw new NotFoundException($"Клиент с Id {id} не найден");
@@ -38,7 +40,7 @@ public class ClientService(CarWashDbContext db) : IClientService
             Id = client.Id,
             FullName = client.FullName,
             Phone = client.Phone,
-            CarIds = client.Cars.Select(car => car.Id).ToList()
+            CarIds = [.. client.Cars.Select(car => car.Id)]
         };
     }
 
@@ -65,7 +67,7 @@ public class ClientService(CarWashDbContext db) : IClientService
             Id = client.Id,
             FullName = client.FullName,
             Phone = client.Phone,
-            CarIds = client.Cars.Select(c => c.Id).ToList()
+            CarIds = [.. client.Cars.Select(c => c.Id)]
         };
     }
 
@@ -104,16 +106,17 @@ public class ClientService(CarWashDbContext db) : IClientService
     public async Task<List<CarDto>> GetClientCarsAsync(int clientId)
     {
         Client client = await db.Clients
+            .AsNoTracking()
             .Include(c => c.Cars)
             .FirstOrDefaultAsync(c => c.Id == clientId)
             ?? throw new NotFoundException($"Клиент с Id {clientId} не найден");
 
-        return client.Cars.Select(c => new CarDto
+        return [.. client.Cars.Select(c => new CarDto
         {
             Id = c.Id,
             LicensePlate = c.LicensePlate,
             Brand = c.Brand
-        }).ToList();
+        })];
     }
 
     public async Task<List<OrderDto>> GetClientOrdersAsync(int clientId)
@@ -124,7 +127,10 @@ public class ClientService(CarWashDbContext db) : IClientService
         }
 
         return await db.Orders
+            .AsNoTracking()
             .Where(o => o.Client.Id == clientId)
+            .OrderBy(o => o.StartTime)
+            .ThenBy(o => o.Id)
             .Select(o => new OrderDto
             {
                 Id = o.Id,

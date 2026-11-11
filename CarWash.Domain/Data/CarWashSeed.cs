@@ -4,7 +4,7 @@ using CarWash.Domain.Enums;
 namespace CarWash.Domain.Data;
 
 /// <summary> 
-/// Тестовые данные для автомойки: cписки машин, клиентов, услуг и заказов
+/// Тестовые данные для автомойки: списки машин, клиентов, услуг и заказов
 /// </summary>
 public static class CarWashSeed
 {
@@ -53,34 +53,34 @@ public static class CarWashSeed
         List<Service> services = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10];
 
         // Время для тестов
-        var baseTime = new DateTime(2026, 5, 10, 10, 0, 0);
+        var baseTime = new DateTime(2026, 5, 10, 10, 0, 0, DateTimeKind.Utc);
 
         // Заказы
         List<Order> orders =
         [
-            // Данилы
+            // Данила
             new Order { Id = 1, Client = client1, Car = car1, Service = s1, StartTime = baseTime, BoxNumber = 1 },
             new Order { Id = 2, Client = client1, Car = car1, Service = s1, StartTime = baseTime.AddHours(2), BoxNumber = 1 },
             new Order { Id = 3, Client = client1, Car = car1, Service = s2, StartTime = baseTime.AddDays(1), BoxNumber = 2 },
             new Order { Id = 4, Client = client1, Car = car1, Service = s7, StartTime = baseTime.AddDays(2), BoxNumber = 1 },
             new Order { Id = 5, Client = client1, Car = car1, Service = s9, StartTime = baseTime.AddDays(3), BoxNumber = 1 },
 
-            // Романа
+            // Роман
             new Order { Id = 6, Client = client2, Car = car2, Service = s2, StartTime = baseTime, BoxNumber = 2 },
             new Order { Id = 7, Client = client2, Car = car2, Service = s2, StartTime = baseTime.AddHours(3), BoxNumber = 1 },
             new Order { Id = 8, Client = client2, Car = car5, Service = s5, StartTime = baseTime.AddDays(1), BoxNumber = 3 },
             new Order { Id = 9, Client = client2, Car = car5, Service = s1, StartTime = baseTime.AddDays(2), BoxNumber = 2 },
 
-            // Никиты
+            // Никита
             new Order { Id = 10, Client = client3, Car = car3, Service = s3, StartTime = baseTime, BoxNumber = 3 },
             new Order { Id = 11, Client = client3, Car = car3, Service = s3, StartTime = baseTime.AddDays(2), BoxNumber = 3 },
             new Order { Id = 12, Client = client3, Car = car3, Service = s3, StartTime = baseTime.AddDays(4), BoxNumber = 3 },
 
-            // Анны
+            // Анна
             new Order { Id = 13, Client = client4, Car = car4, Service = s5, StartTime = baseTime.AddMinutes(10), BoxNumber = 4 },
             new Order { Id = 14, Client = client4, Car = car4, Service = s1, StartTime = baseTime.AddDays(1), BoxNumber = 1 },
 
-            // Александра
+            // Александр
             new Order { Id = 15, Client = client5, Car = car1, Service = s4, StartTime = baseTime.AddHours(5), BoxNumber = 2 },
             new Order { Id = 16, Client = client5, Car = car1, Service = s6, StartTime = baseTime.AddDays(3), BoxNumber = 2 },
 

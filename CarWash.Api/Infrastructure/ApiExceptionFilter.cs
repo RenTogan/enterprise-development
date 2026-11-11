@@ -1,11 +1,13 @@
 ﻿using CarWash.Application.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace CarWash.Api.Infrastructure;
 
 /// <summary>
-/// Перехват исключений и преоб-ие в читаемый ProblemDetails
+/// Перехват исключений и преобразование в читаемый ProblemDetails
 /// </summary>
 public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger) : IExceptionFilter
 {
@@ -13,12 +15,14 @@ public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger) : IException
     {
         Exception exception = context.Exception;
 
-        (var statusCode, var title) = exception switch
+        (var statusCode, var title, var detail) = exception switch
         {
-            NotFoundException => (StatusCodes.Status404NotFound, "Ресурс не найден"),
-            BadRequestException => (StatusCodes.Status400BadRequest, "Некорректный запрос"),
-            ConflictException => (StatusCodes.Status409Conflict, "конфликт данных"),
-            _ => (StatusCodes.Status500InternalServerError, "Внутренняя ошибка сервера")
+            NotFoundException => (StatusCodes.Status404NotFound, "Ресурс не найден", exception.Message),
+            BadRequestException => (StatusCodes.Status400BadRequest, "Некорректный запрос", exception.Message),
+            ConflictException => (StatusCodes.Status409Conflict, "Конфликт данных", exception.Message),
+            DbUpdateException dbEx when dbEx.InnerException is PostgresException pgEx => HandlePostgresException(pgEx),
+            DbUpdateException => (StatusCodes.Status409Conflict, "Ошибка сохранения данных", "Не удалось сохранить изменения из-за конфликта данных."),
+            _ => (StatusCodes.Status500InternalServerError, "Внутренняя ошибка сервера", "Произошла непредвиденная ошибка на сервере")
         };
 
         if (statusCode == StatusCodes.Status500InternalServerError)
@@ -30,13 +34,18 @@ public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger) : IException
         {
             Status = statusCode,
             Title = title,
-            Detail = statusCode == StatusCodes.Status500InternalServerError
-                ? "Произошла непредвиденная ошибка на сервере"
-                : exception.Message,
+            Detail = detail,
             Instance = context.HttpContext.Request.Path
         };
 
         context.Result = new ObjectResult(problem) { StatusCode = statusCode };
         context.ExceptionHandled = true;
     }
+
+    private static (int StatusCode, string Title, string Detail) HandlePostgresException(PostgresException pgEx) => pgEx.SqlState switch
+    {
+        PostgresErrorCodes.UniqueViolation => (StatusCodes.Status409Conflict, "Конфликт уникальности", "Запись с такими уникальными данными уже существует."),
+        PostgresErrorCodes.ForeignKeyViolation => (StatusCodes.Status409Conflict, "Конфликт внешнего ключа", "Операция нарушает ссылочную целостность данных."),
+        _ => (StatusCodes.Status400BadRequest, "Ошибка базы данных", pgEx.MessageText)
+    };
 }

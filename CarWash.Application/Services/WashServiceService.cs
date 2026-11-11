@@ -2,7 +2,6 @@
 using CarWash.Application.Interfaces;
 using CarWash.Contracts.Dtos;
 using CarWash.Domain.Entities;
-using CarWash.Infrastructure.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarWash.Application.Services;
@@ -10,11 +9,12 @@ namespace CarWash.Application.Services;
 /// <summary>
 /// Реализация сервиса услуг
 /// </summary>
-public class WashServiceService(CarWashDbContext db) : IWashServiceService
+public class WashServiceService(ICarWashDbContext db) : IWashServiceService
 {
     public async Task<List<ServiceDto>> GetAllAsync()
     {
         return await db.Services
+            .AsNoTracking()
             .Select(s => new ServiceDto
             {
                 Id = s.Id,
@@ -28,7 +28,9 @@ public class WashServiceService(CarWashDbContext db) : IWashServiceService
 
     public async Task<ServiceDto> GetByIdAsync(int id)
     {
-        Service s = await db.Services.FirstOrDefaultAsync(x => x.Id == id)
+        Service s = await db.Services
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id)
             ?? throw new NotFoundException($"Услуга с Id {id} не найдена");
 
         return new ServiceDto
