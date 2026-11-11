@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using System.Text.Json.Serialization;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
@@ -39,11 +39,11 @@ builder.Services.AddScoped<IWashServiceService, WashServiceService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
-WebApplication app = builder.Build();
+var app = builder.Build();
 
-using (IServiceScope scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
-    CarWashDbContext db = scope.ServiceProvider.GetRequiredService<CarWashDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<CarWashDbContext>();
     await db.Database.MigrateAsync();
 }
 

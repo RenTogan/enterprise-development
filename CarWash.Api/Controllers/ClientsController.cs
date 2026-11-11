@@ -29,7 +29,7 @@ public class ClientsController(IClientService clientService) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ClientDto>> Create([FromBody] ClientRequest request)
     {
-        ClientDto created = await clientService.CreateAsync(request);
+        var created = await clientService.CreateAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 

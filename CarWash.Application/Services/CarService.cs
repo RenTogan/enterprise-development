@@ -21,7 +21,7 @@ public class CarService(ICarWashDbContext db) : ICarService
 
     public async Task<CarDto> GetByIdAsync(int id)
     {
-        Car car = await db.Cars
+        var car = await db.Cars
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id)
             ?? throw new NotFoundException($"Машина с Id {id} не найдена");
@@ -61,7 +61,7 @@ public class CarService(ICarWashDbContext db) : ICarService
 
     public async Task UpdateAsync(int id, CarRequest request)
     {
-        Car car = await db.Cars.FirstOrDefaultAsync(c => c.Id == id)
+        var car = await db.Cars.FirstOrDefaultAsync(c => c.Id == id)
             ?? throw new NotFoundException($"Машина с Id {id} не найдена");
 
         var plate = request.LicensePlate.Trim().ToUpperInvariant();
@@ -77,7 +77,7 @@ public class CarService(ICarWashDbContext db) : ICarService
 
     public async Task DeleteAsync(int id)
     {
-        Car car = await db.Cars.FirstOrDefaultAsync(c => c.Id == id)
+        var car = await db.Cars.FirstOrDefaultAsync(c => c.Id == id)
             ?? throw new NotFoundException($"Машина с Id {id} не найдена");
 
         if (await db.Orders.AnyAsync(o => o.Car.Id == id))

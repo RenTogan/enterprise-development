@@ -1,11 +1,11 @@
-IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
+var builder = DistributedApplication.CreateBuilder(args);
 
-IResourceBuilder<ParameterResource> postgresPassword = builder.AddParameter("postgres-password", "postgres", secret: true);
+var postgresPassword = builder.AddParameter("postgres-password", "postgres", secret: true);
 
-IResourceBuilder<PostgresServerResource> postgres = builder.AddPostgres("postgres", password: postgresPassword)
+var postgres = builder.AddPostgres("postgres", password: postgresPassword)
     .WithDataVolume();
 
-IResourceBuilder<PostgresDatabaseResource> db = postgres.AddDatabase("carwashdb");
+var db = postgres.AddDatabase("carwashdb");
 
 builder.AddProject<Projects.CarWash_Api>("api")
     .WithReference(db)

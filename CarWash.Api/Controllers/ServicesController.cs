@@ -29,7 +29,7 @@ public class ServicesController(IWashServiceService washService) : ControllerBas
     [HttpPost]
     public async Task<ActionResult<ServiceDto>> Create([FromBody] ServiceRequest request)
     {
-        ServiceDto created = await washService.CreateAsync(request);
+        var created = await washService.CreateAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 

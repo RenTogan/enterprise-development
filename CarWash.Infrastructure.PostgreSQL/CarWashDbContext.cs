@@ -64,7 +64,7 @@ public class CarWashDbContext(DbContextOptions<CarWashDbContext> options) : DbCo
 
     private static void SeedData(ModelBuilder modelBuilder)
     {
-        (List<Car>? cars, List<Client>? clients, List<Service>? services, List<Order>? orders) = CarWashSeed.CreateInitialData();
+        (var cars, var clients, var services, var orders) = CarWashSeed.CreateInitialData();
 
         modelBuilder.Entity<Car>().HasData(cars.Select(c => new
         {

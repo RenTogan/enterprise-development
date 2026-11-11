@@ -29,7 +29,7 @@ public class CarsController(ICarService carService) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<CarDto>> Create([FromBody] CarRequest request)
     {
-        CarDto created = await carService.CreateAsync(request);
+        var created = await carService.CreateAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 

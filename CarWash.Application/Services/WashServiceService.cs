@@ -28,7 +28,7 @@ public class WashServiceService(ICarWashDbContext db) : IWashServiceService
 
     public async Task<ServiceDto> GetByIdAsync(int id)
     {
-        Service s = await db.Services
+        var s = await db.Services
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id)
             ?? throw new NotFoundException($"Услуга с Id {id} не найдена");
@@ -68,7 +68,7 @@ public class WashServiceService(ICarWashDbContext db) : IWashServiceService
 
     public async Task UpdateAsync(int id, ServiceRequest request)
     {
-        Service service = await db.Services.FirstOrDefaultAsync(s => s.Id == id)
+        var service = await db.Services.FirstOrDefaultAsync(s => s.Id == id)
             ?? throw new NotFoundException($"Услуга с Id {id} не найдена");
 
         service.Name = request.Name.Trim();
@@ -81,7 +81,7 @@ public class WashServiceService(ICarWashDbContext db) : IWashServiceService
 
     public async Task DeleteAsync(int id)
     {
-        Service service = await db.Services.FirstOrDefaultAsync(s => s.Id == id)
+        var service = await db.Services.FirstOrDefaultAsync(s => s.Id == id)
             ?? throw new NotFoundException($"Услуга с Id {id} не найдена");
 
         if (await db.Orders.AnyAsync(o => o.Service.Id == id))

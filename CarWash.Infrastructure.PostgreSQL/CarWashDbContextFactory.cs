@@ -13,7 +13,7 @@ public class CarWashDbContextFactory : IDesignTimeDbContextFactory<CarWashDbCont
     {
         var basePath = Directory.GetCurrentDirectory();
 
-        IConfigurationRoot configuration = new ConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .SetBasePath(basePath)
             .AddJsonFile("appsettings.json", optional: true)
             .AddJsonFile("appsettings.Development.json", optional: true)
@@ -24,7 +24,7 @@ public class CarWashDbContextFactory : IDesignTimeDbContextFactory<CarWashDbCont
             ?? configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Строка подключения 'carwashdb' не найдена в конфигурации.");
 
-        DbContextOptions<CarWashDbContext> options = new DbContextOptionsBuilder<CarWashDbContext>()
+        var options = new DbContextOptionsBuilder<CarWashDbContext>()
             .UseNpgsql(connectionString)
             .Options;
 

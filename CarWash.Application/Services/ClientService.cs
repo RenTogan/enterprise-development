@@ -29,7 +29,7 @@ public class ClientService(ICarWashDbContext db) : IClientService
 
     public async Task<ClientDto> GetByIdAsync(int id)
     {
-        Client client = await db.Clients
+        var client = await db.Clients
             .AsNoTracking()
             .Include(c => c.Cars)
             .FirstOrDefaultAsync(c => c.Id == id)
@@ -73,7 +73,7 @@ public class ClientService(ICarWashDbContext db) : IClientService
 
     public async Task UpdateAsync(int id, ClientRequest request)
     {
-        Client client = await db.Clients
+        var client = await db.Clients
             .Include(c => c.Cars)
             .FirstOrDefaultAsync(c => c.Id == id)
             ?? throw new NotFoundException($"Клиент с Id {id} не найден");
@@ -91,7 +91,7 @@ public class ClientService(ICarWashDbContext db) : IClientService
 
     public async Task DeleteAsync(int id)
     {
-        Client client = await db.Clients.FirstOrDefaultAsync(c => c.Id == id)
+        var client = await db.Clients.FirstOrDefaultAsync(c => c.Id == id)
             ?? throw new NotFoundException($"Клиент с Id {id} не найден");
 
         if (await db.Orders.AnyAsync(o => o.Client.Id == id))
@@ -105,7 +105,7 @@ public class ClientService(ICarWashDbContext db) : IClientService
 
     public async Task<List<CarDto>> GetClientCarsAsync(int clientId)
     {
-        Client client = await db.Clients
+        var client = await db.Clients
             .AsNoTracking()
             .Include(c => c.Cars)
             .FirstOrDefaultAsync(c => c.Id == clientId)

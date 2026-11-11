@@ -47,13 +47,13 @@ public class OrderService(ICarWashDbContext db) : IOrderService
 
     public async Task<OrderDto> CreateAsync(OrderRequest request)
     {
-        Client client = await db.Clients.FirstOrDefaultAsync(c => c.Id == request.ClientId!.Value)
+        var client = await db.Clients.FirstOrDefaultAsync(c => c.Id == request.ClientId!.Value)
             ?? throw new BadRequestException($"Клиент с Id {request.ClientId} не существует");
 
-        Service service = await db.Services.FirstOrDefaultAsync(s => s.Id == request.ServiceId!.Value)
+        var service = await db.Services.FirstOrDefaultAsync(s => s.Id == request.ServiceId!.Value)
             ?? throw new BadRequestException($"Услуга с Id {request.ServiceId} не существует");
 
-        Car car = await db.Cars.FirstOrDefaultAsync(c => c.Id == request.CarId!.Value)
+        var car = await db.Cars.FirstOrDefaultAsync(c => c.Id == request.CarId!.Value)
             ?? throw new BadRequestException($"Автомобиль с Id {request.CarId} не существует");
 
         var order = new Order
@@ -84,16 +84,16 @@ public class OrderService(ICarWashDbContext db) : IOrderService
 
     public async Task UpdateAsync(int id, OrderRequest request)
     {
-        Order order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id)
+        var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id)
             ?? throw new NotFoundException($"Заказ с Id {id} не найден");
 
-        Client client = await db.Clients.FirstOrDefaultAsync(c => c.Id == request.ClientId!.Value)
+        var client = await db.Clients.FirstOrDefaultAsync(c => c.Id == request.ClientId!.Value)
             ?? throw new BadRequestException($"Клиент с Id {request.ClientId} не существует");
 
-        Service service = await db.Services.FirstOrDefaultAsync(s => s.Id == request.ServiceId!.Value)
+        var service = await db.Services.FirstOrDefaultAsync(s => s.Id == request.ServiceId!.Value)
             ?? throw new BadRequestException($"Услуга с Id {request.ServiceId} не существует");
 
-        Car car = await db.Cars.FirstOrDefaultAsync(c => c.Id == request.CarId!.Value)
+        var car = await db.Cars.FirstOrDefaultAsync(c => c.Id == request.CarId!.Value)
             ?? throw new BadRequestException($"Автомобиль с Id {request.CarId} не существует");
 
         order.Client = client;
@@ -107,7 +107,7 @@ public class OrderService(ICarWashDbContext db) : IOrderService
 
     public async Task DeleteAsync(int id)
     {
-        Order order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id)
+        var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id)
             ?? throw new NotFoundException($"Заказ с Id {id} не найден");
 
         db.Orders.Remove(order);

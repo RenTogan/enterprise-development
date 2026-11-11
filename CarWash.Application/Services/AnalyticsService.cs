@@ -1,6 +1,5 @@
 ﻿using CarWash.Application.Interfaces;
 using CarWash.Contracts.Dtos;
-using CarWash.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarWash.Application.Services;
@@ -25,7 +24,7 @@ public class AnalyticsService(ICarWashDbContext db) : IAnalyticsService
     // Зап2: Автомобили на мойке прямо сейчас
     public async Task<List<ActiveCarDto>> GetCurrentCarsAtWashAsync(DateTimeOffset? atTime = null)
     {
-        DateTime time = (atTime ?? DateTimeOffset.UtcNow).UtcDateTime;
+        var time = (atTime ?? DateTimeOffset.UtcNow).UtcDateTime;
 
         return await db.Orders
             .AsNoTracking()
@@ -57,20 +56,20 @@ public class AnalyticsService(ICarWashDbContext db) : IAnalyticsService
     // Зап4: Время освобождения бокса
     public async Task<BoxFreeTimeDto> GetBoxFreeTimeAsync(int boxNumber, DateTimeOffset? fromTime = null)
     {
-        DateTime currentTime = (fromTime ?? DateTimeOffset.UtcNow).UtcDateTime;
+        var currentTime = (fromTime ?? DateTimeOffset.UtcNow).UtcDateTime;
 
-        List<Order> busyOrders = await db.Orders
+        var busyOrders = await db.Orders
             .AsNoTracking()
             .Include(o => o.Service)
             .Where(o => o.BoxNumber == boxNumber)
             .OrderBy(o => o.StartTime)
             .ToListAsync();
 
-        DateTime freeTime = currentTime;
+        var freeTime = currentTime;
 
-        foreach (Order? order in busyOrders.Where(o => o.StartTime.AddMinutes(o.Service.DurationMinutes) > currentTime))
+        foreach (var order in busyOrders.Where(o => o.StartTime.AddMinutes(o.Service.DurationMinutes) > currentTime))
         {
-            DateTime orderEndTime = order.StartTime.AddMinutes(order.Service.DurationMinutes);
+            var orderEndTime = order.StartTime.AddMinutes(order.Service.DurationMinutes);
 
             if (order.StartTime <= freeTime)
             {

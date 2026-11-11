@@ -13,7 +13,7 @@ public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger) : IException
 {
     public void OnException(ExceptionContext context)
     {
-        Exception exception = context.Exception;
+        var exception = context.Exception;
 
         (var statusCode, var title, var detail) = exception switch
         {
