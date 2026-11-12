@@ -10,4 +10,5 @@
   <Project Path="CarWash.Domain/CarWash.Domain.csproj" />
   <Project Path="CarWash.Infrastructure.PostgreSQL/CarWash.Infrastructure.PostgreSQL.csproj" />
   <Project Path="CarWash.ServiceDefaults/CarWash.ServiceDefaults.csproj" />
+  <Project Path="CarWash.Tests/CarWash.Tests.csproj" />
 </Solution>
